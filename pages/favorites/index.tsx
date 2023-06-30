@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import localFavorites from '../../utils/localFavorites';
-import { NoFavorite, FavoritePokemon } from '../../components/ui';
+import { NoFavorite } from '../../components/ui';
 import { MainLayout } from '../../components/Layouts';
+import { FavoritePokemon } from '../../components/pokemon';
 
 const FavoritePage = () => {
   const [favoritePokemon, setFavoritePokemon] = useState<number[]>([]);
