@@ -9,7 +9,7 @@ interface MainLayoutProps {
 }
 
 const origin =
-  window.location.origin === 'undefined' ? '' : window.location.origin;
+ typeof window === 'undefined' ? ' ' : window.location.origin;
 
 export const MainLayout: FC<MainLayoutProps> = ({ children, title }) => {
   return (
