@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { NextPage, GetStaticProps, GetStaticPaths } from 'next';
 import { Button, Card, Container, Grid, Image, Text } from '@nextui-org/react';
@@ -15,13 +15,16 @@ interface Prop {
 }
 
 const PokemonPage: NextPage<Prop> = ({ pokemon }) => {
-  const [existInFavorites, setExistInFavorites] = useState(
-    localFavorites.existInFavorites(pokemon.id)
-  );
+  const [existInFavorites, setExistInFavorites] = useState(false);
+
+  useEffect(() => {
+    setExistInFavorites(localFavorites.existInFavorites(pokemon.id));
+  }, [pokemon.id]);
 
   const onToggleFavorite = () => {
     localFavorites.toggleFavorite(pokemon.id);
     setExistInFavorites(!existInFavorites);
+
     if (existInFavorites) return;
 
     confetti({

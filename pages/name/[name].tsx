@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 
@@ -16,9 +16,11 @@ interface Prop {
 }
 
 const PokemonByNamePage: NextPage<Prop> = ({ pokemon }) => {
-  const [existInFavorites, setExistInFavorites] = useState(
-    localFavorites.existInFavorites(pokemon.id)
-  );
+  const [existInFavorites, setExistInFavorites] = useState(false);
+
+  useEffect(() => {
+    setExistInFavorites(localFavorites.existInFavorites(pokemon.id));
+  }, [pokemon.id]);
 
   const onToggleFavorite = () => {
     localFavorites.toggleFavorite(pokemon.id);
@@ -126,10 +128,9 @@ const PokemonByNamePage: NextPage<Prop> = ({ pokemon }) => {
   );
 };
 
-
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
-    const { data } = await pokeApi.get<PokemonListResponse>('/pokemon?limit=151');
-    const pokemonsName: string[] = data.results.map((pokemon) => pokemon.name);
+  const { data } = await pokeApi.get<PokemonListResponse>('/pokemon?limit=151');
+  const pokemonsName: string[] = data.results.map((pokemon) => pokemon.name);
 
   return {
     paths: pokemonsName.map((name) => ({
@@ -137,16 +138,26 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
         name,
       },
     })),
-    fallback: false,
-};
+    fallback: 'blocking',
+  };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { name } = params as { name: string };
+  const pokemon = await getPokemonInfo(name);
+
+  if (!pokemon) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
-      pokemon: await getPokemonInfo(name),
+      pokemon,
     },
   };
 };
